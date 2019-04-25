@@ -11,7 +11,7 @@ export default {
             window.location.reload()
         },
         start(){
-            this.$eventOne.$emit('start', true)
+            this.$eventOne.$emit('startGame', true)
         }
     }
 }
