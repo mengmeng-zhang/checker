@@ -27,7 +27,11 @@ export default {
             position: [],
             iTouchX: 0,
             iSlideL: 0,
-            target: ''
+            target: '',
+            targetWidth: 0,
+            targetHeight: 0,
+            moveY: 0,
+            currTarget: ''
         }
     },
     methods: {
@@ -37,31 +41,43 @@ export default {
             })
         },
         checkerStyle(item){
+            this.targetHeight = item.height
+            this.targetWidth = item.width
             return `background: url("${this.imageUrl}") ${item.x}px ${item.y}px / 460px 460px;
             width: ${item.width}px; height: ${item.height}px;`
         },
         touchstart(event, index){
           this.target = event.target
-          this.iTouchX = event.changedTouches[0].clientY
+          this.iTouchY = event.changedTouches[0].clientY
           this.iSlideL = this.target.offsetTop
+          console.log(this.iSlideL)
         },
         touchmove(event, index){
-          let target = event.target
-          let x = target.style.height
-          let top = target.style.top
-          // console.log(this.iTouchX, this.iSlideL)
-          // console.log(Number(top.substr(0, top.length - 2)))
-          let y = event.changedTouches[0].clientY - this.iTouchX + this.iSlideL
-          if(y < this.iSlideL){
-            target.style.top = this.iSlideL + 'px'
-          }else{
-            target.style.top = y + 'px'
-          }
-          // console.log(event.changedTouches[0].clientY - this.iTouchX)
-          // target.style.top = event.changedTouches[0].clientY - this.iTouchX + this.iSlideL + 'px'
+            let x = this.target.style.height
+            let top = this.target.style.top
+            this.moveY = event.changedTouches[0].clientY - this.iTouchY
+            let y = event.changedTouches[0].clientY - this.iTouchY + this.iSlideL
+            
+            if(this.moveY > 0 && this.iSlideL > this.targetHeight * 2){
+                //   鼠标向下移动，offsetTop 大于自身高度的两倍
+                this.target.style.top = (this.targetHeight * 2) + 'px'
+            }else if(this.moveY < 0 && this.iSlideL < this.targetHeight){
+                //   鼠标向上移动，offsetTop 小于自身高度
+                this.target.style.top = this.targetHeight + 'px'
+            }else{
+                this.target.style.top = (this.moveY + this.iSlideL) + 'px'
+            }
         },
         touchend(event, index){
-            console.log(event, index)
+            if(this.moveY > 0 && this.iSlideL > this.targetHeight * 2){
+                //   鼠标向下移动，offsetTop 大于自身高度的两倍
+                this.target.style.top = (this.targetHeight * 2) + 'px'
+            }else if(this.moveY < 0 && this.iSlideL < this.targetHeight){
+                //   鼠标向上移动，offsetTop 小于自身高度
+                this.target.style.top = this.targetHeight + 'px'
+            }else{
+                this.target.style.top = (this.moveY + this.iSlideL) + 'px'
+            }
         },
         startGame(){
             let self = this
@@ -116,7 +132,7 @@ export default {
     border:1px solid #ccc;
     box-sizing: border-box;
     cursor: pointer;
-    transition: all 0.5s;
+    transition: all 0.1s linear;
 }
 .start-checker{
     position: absolute;
